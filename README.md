@@ -34,4 +34,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) f
 
 ## Contact
 
-If you have any questions or feedback, feel free to [open an issue](https://github.com/ehv20/HypoMap/issues).
+If you have any questions or feedback, feel free to [open an issue](https://github.com/ehvr20/HypoMap/issues).
