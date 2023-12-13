@@ -11,7 +11,7 @@ function get_repo_file () {
 	if [ ! -e "$output_dir/$filename" ];then
   	      wget -P $output_dir "$repo/$filepath"
 	else
-	      echo "$repo/$filename already retrieved"
+	      echo "$output_dir/$filename already retrieved"
 	fi
 }
 
