@@ -15,13 +15,13 @@ function get_repo_file () {
 	fi
 }
 
-get_repo_file "scripts/utils/matrix_h5_format.py" "scripts/"
-get_repo_file "scripts/utils/link_data.sh" "scripts/"
-get_repo_file "scripts/utils/extract_starsolo_results.sh" "scripts/"
-get_repo_file "scripts/smartseq/generate_manifest-ss.sh" "scripts/"
-get_repo_file "scripts/smartseq/slurm-starsolo-ss.sh" "scripts/"
-get_repo_file "scripts/smartseq/slurm-bam_processing-ss.sh" "scripts/"
-get_repo_file "scripts/smartseq/run_smartseq.sh" "."
+get_repo_file "counting/utils/matrix_h5_format.py" "scripts/"
+get_repo_file "counting/utils/link_data.sh" "scripts/"
+get_repo_file "counting/utils/extract_starsolo_results.sh" "scripts/"
+get_repo_file "counting/smartseq/generate_manifest-ss.sh" "scripts/"
+get_repo_file "counting/smartseq/slurm-starsolo-ss.sh" "scripts/"
+get_repo_file "counting/smartseq/slurm-bam_processing-ss.sh" "scripts/"
+get_repo_file "counting/smartseq/run_smartseq.sh" "."
 
 
 echo "$0 finished!"

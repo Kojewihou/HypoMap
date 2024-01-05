@@ -15,9 +15,9 @@ function get_repo_file () {
         fi
 }
 
-get_repo_file "scripts/setup/setup_smartseq.sh" "smartseq/"
-get_repo_file "scripts/setup/setup_dropseq.sh" "dropseq/"
-get_repo_file "scripts/setup/setup_tenx.sh" "tenx/"
+get_repo_file "counting/setup/setup_smartseq.sh" "smartseq/"
+get_repo_file "counting/setup/setup_dropseq.sh" "dropseq/"
+get_repo_file "counting/setup/setup_tenx.sh" "tenx/"
 
 echo "$0 finished!"
 exit 0

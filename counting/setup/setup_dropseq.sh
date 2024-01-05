@@ -15,16 +15,16 @@ function get_repo_file () {
 	fi
 }
 
-get_repo_file "scripts/dropseq/run_dropseq.sh" "."
+get_repo_file "counting/dropseq/run_dropseq.sh" "."
 
-get_repo_file "scripts/utils/link_data.sh" "scripts/"
-get_repo_file "scripts/utils/extract_starsolo_results.sh" "scripts/"
-get_repo_file "scripts/utils/matrix_h5_format.py" "scripts/"
-get_repo_file "scripts/utils/generate_sample_list.py" "scripts/"
+get_repo_file "counting/utils/link_data.sh" "scripts/"
+get_repo_file "counting/utils/extract_starsolo_results.sh" "scripts/"
+get_repo_file "counting/utils/matrix_h5_format.py" "scripts/"
+get_repo_file "counting/utils/generate_sample_list.py" "scripts/"
 
 
-get_repo_file "scripts/dropseq/generate_manifest.sh" "scripts/"
-get_repo_file "scripts/dropseq/slurm-starsolo-ds.sh" "scripts/"
+get_repo_file "counting/dropseq/generate_manifest.sh" "scripts/"
+get_repo_file "counting/dropseq/slurm-starsolo-ds.sh" "scripts/"
 
 
 echo "$0 finished!"

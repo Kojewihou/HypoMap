@@ -15,16 +15,16 @@ function get_repo_file () {
         fi
 }
 
-get_repo_file "scripts/utils/link_data.sh" "scripts/"
-get_repo_file "scripts/utils/generate_sample_list.sh" "scripts/"
+get_repo_file "counting/utils/link_data.sh" "scripts/"
+get_repo_file "counting/utils/generate_sample_list.sh" "scripts/"
 
-get_repo_file "scripts/tenx/rename_10x_files.sh" "scripts/"
-get_repo_file "scripts/tenx/extract_10x_results.sh" "scripts/"
-get_repo_file "scripts/tenx/slurm-cellranger.sh" "scripts/"
+get_repo_file "counting/tenx/rename_10x_files.sh" "scripts/"
+get_repo_file "counting/tenx/extract_10x_results.sh" "scripts/"
+get_repo_file "counting/tenx/slurm-cellranger.sh" "scripts/"
 
-get_repo_file "scripts/tenx/map.txt" "temp/"
+get_repo_file "counting/tenx/map.txt" "temp/"
 
-get_repo_file "scripts/tenx/run_tenx.sh" "."
+get_repo_file "counting/tenx/run_tenx.sh" "."
 
 
 
