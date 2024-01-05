@@ -17,7 +17,7 @@ for multimap_matrix in $(find ../results -type f -name "UniqueAndMult_matrix.h5"
 done
 
 for filtered_matrix in $(find ../results -type f -name "Filtered_matrix.h5");do
-        refid=$(echo $unique_matrix | cut -d'/' -f 3)
+        refid=$(echo $filtered_matrix | cut -d'/' -f 3)
         echo $refid
         echo $filtered_matrix
         ln -srvf $filtered_matrix $output_path/${refid}_filtered_matrix.h5
