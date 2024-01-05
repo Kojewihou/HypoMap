@@ -64,7 +64,7 @@ rm ../results/$sample_name/outs/possorted_genome_bam.bam
 
 # Link up to count table merger
 ln -srf "${sample_name}/outs/filtered_feature_bc_matrix.h5" "../../outs/${sample_name}_filtered_matrix.h5"
-ln -srf "${sample_name}/outs/raw_feature_bc_matrix.h5" "../../outs/${sample_name}_raw_matrix.h5"
+ln -srf "${sample_name}/outs/raw_feature_bc_matrix.h5" "../../outs/${sample_name}_unique_matrix.h5"
 
 # Remove excess cellranger debug files
 rm -r "${sample_name}/SC_RNA_COUNTER_CS"
