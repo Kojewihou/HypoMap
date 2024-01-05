@@ -9,7 +9,7 @@ function get_repo_file () {
 	output_dir=$2
 	filename=$(basename $filepath)
 	if [ ! -e "$output_dir/$filename" ];then
-  	      wget -P $output_dir "$repo/$filepath"
+  	      wget -nv -P $output_dir "$repo/$filepath"
 	else
 	      echo "$output_dir/$filename already retrieved"
 	fi
