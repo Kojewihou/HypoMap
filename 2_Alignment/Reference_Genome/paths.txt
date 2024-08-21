@@ -1,0 +1,2 @@
+/rds/project/rds-O11U8YqSuCk/ehv20/reference_genome/Mus_musculus.GRCm39.110.woGm28040.gtf.gz
+/rds/project/rds-O11U8YqSuCk/ehv20/reference_genome/Mus_musculus.GRCm39.dna.toplevel.fa.gz
