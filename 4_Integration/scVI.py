@@ -1,3 +1,44 @@
+"""
+This script sets up and runs an integration model for single-cell RNA-seq data analysis using scVI. 
+It includes steps to load and preprocess the dataset, train a scVI model, and compute dimensionality 
+reduction embeddings such as UMAP and t-SNE. 
+
+Overview:
+- `main`: Main function to execute the integration pipeline.
+- `initialize_model_directory`: Creates a directory structure for storing model results, parameters, and datasets.
+- `get_model_embedding`: Retrieves the latent representation of cells using a specified model function.
+- `get_scvi_embedding`: Trains or loads a pre-trained scVI model to obtain the latent embedding.
+- `plot_model_history`: Plots the training history of the scVI model, including ELBO and reconstruction loss.
+  
+Dependencies:
+- argparse: For parsing command-line arguments.
+- json: For loading model parameters from a JSON file.
+- logging: For logging informational and debugging messages.
+- os: For file and directory manipulation.
+- shutil: For copying files.
+- warnings: To ignore deprecation and user warnings.
+- numpy, pandas: For numerical and data manipulation.
+- scanpy: For processing and analyzing single-cell RNA-seq data.
+- scvi: For training and using scVI models.
+- torch: For setting floating point precision in matrix multiplications.
+- matplotlib: For plotting the model's training history.
+- rapids_singlecell: (Optional) For GPU-accelerated computation.
+
+Functions:
+- main(args: argparse.Namespace) -> None: Main pipeline execution function, orchestrating data loading, model training, 
+  and embedding calculations.
+- initialize_model_directory(parameter_file: str) -> None: Creates directory structure and copies input files for 
+  the integration model.
+- get_model_embedding(adata: sc.AnnData, parameters: dict, model_func) -> np.array: Obtains the latent embedding 
+  using a provided model function.
+- get_scvi_embedding(adata: sc.AnnData, parameters: dict) -> np.array: Loads or trains a scVI model to get the 
+  latent representation of the input data.
+- plot_model_history(history) -> matplotlib.figure.Figure: Generates and returns a plot of the scVI model's training history.
+
+Example usage:
+    python script.py integration_params.json --verbose
+"""
+
 import argparse
 import json
 import logging
@@ -23,6 +64,21 @@ global OUTDIR
 EMBEDDING_KEY = 'X_embed'
 
 def main(args: argparse.Namespace) -> None:
+    """
+    Main function to execute the single-cell RNA-seq integration pipeline using scVI. 
+    This function initializes model directories, loads datasets, subsets genes, and calculates embeddings, 
+    including UMAP, t-SNE, and Leiden clustering.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Command-line arguments containing the path to the integration parameter JSON file 
+        and optional verbosity level.
+
+    Returns
+    -------
+    None
+    """
     
     global PARAMETERS
     global OUTDIR 
@@ -111,10 +167,17 @@ def main(args: argparse.Namespace) -> None:
     logger.info(f'Saving embedding to {embedding_only_file}')
 
 def initialize_model_directory(parameter_file: str) -> None:
-    """Create directory for new model (WORKDIR), hard linking in datasets and copying the parameter file.
+    """
+    Create directory for new model (WORKDIR), hard linking datasets and copying the parameter file.
 
-    Args:
-        parameter_file (str): Filepath to parameter file.
+    Parameters
+    ----------
+    parameter_file : str
+        Filepath to the parameter file.
+
+    Returns
+    -------
+    None
     """
     global PARAMETERS
     global OUTDIR
@@ -126,10 +189,8 @@ def initialize_model_directory(parameter_file: str) -> None:
     logger.info(f'Subdirectories created in {OUTDIR}')
 
     try:
-        copy2(PARAMETERS['hvgs'],
-                os.path.join(OUTDIR, 'metrics/hvgs.csv'))
-        copy2(PARAMETERS['dataset'],
-                os.path.join(OUTDIR, 'datasets/raw.h5ad'))
+        copy2(PARAMETERS['hvgs'], os.path.join(OUTDIR, 'metrics/hvgs.csv'))
+        copy2(PARAMETERS['dataset'], os.path.join(OUTDIR, 'datasets/raw.h5ad'))
         logger.info(f'Copied datasets into {OUTDIR}')
     except SameFileError:
         logger.warn(f'Datasets already present in {OUTDIR}')
@@ -142,9 +203,44 @@ def initialize_model_directory(parameter_file: str) -> None:
         pass
 
 def get_model_embedding(adata: sc.AnnData, parameters: dict, model_func) -> np.array:
+    """
+    Obtains the latent embedding of cells using the specified model function.
+
+    Parameters
+    ----------
+    adata : sc.AnnData
+        Annotated data matrix from the `scanpy` library.
+    
+    parameters : dict
+        Dictionary containing model parameters.
+    
+    model_func : function
+        A function to compute the model embedding.
+
+    Returns
+    -------
+    np.array
+        Array of the latent embeddings.
+    """
     return model_func(adata, parameters)
 
 def get_scvi_embedding(adata: sc.AnnData, parameters: dict) -> np.array:  
+    """
+    Trains or loads a scVI model and obtains the latent representation of the input AnnData object.
+
+    Parameters
+    ----------
+    adata : sc.AnnData
+        Annotated data matrix from the `scanpy` library.
+    
+    parameters : dict
+        Dictionary containing parameters for setting up and training the scVI model.
+
+    Returns
+    -------
+    np.array
+        The latent representation of the cells in the AnnData object.
+    """
     global OUTDIR
     
     model_dir = os.path.join(OUTDIR, 'models/scvi')
@@ -155,11 +251,8 @@ def get_scvi_embedding(adata: sc.AnnData, parameters: dict) -> np.array:
         model = scvi.model.SCVI.load(model_dir, adata=adata)
     else:
         scvi.model.SCVI.setup_anndata(adata, **model_parameters.get('setup_anndata_kwargs', {}))
-
-        model = scvi.model.SCVI(adata, **model_parameters.get('model_kwargs', {}), )
-
+        model = scvi.model.SCVI(adata, **model_parameters.get('model_kwargs', {}))
         model.train(**model_parameters.get('train_kwargs', {}))
-
         model.save(model_dir)
     
     fig = plot_model_history(model.history)
@@ -168,9 +261,23 @@ def get_scvi_embedding(adata: sc.AnnData, parameters: dict) -> np.array:
     return model.get_latent_representation()
 
 def plot_model_history(history):
+    """
+    Plots the training history of the scVI model, including ELBO and reconstruction loss over epochs.
+
+    Parameters
+    ----------
+    history : dict
+        A dictionary containing the training history of the model, with keys such as 'elbo_train', 
+        'elbo_validation', 'reconstruction_loss_train', 'reconstruction_loss_validation', and 'kl_weight'.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        A figure object containing the plotted training history.
+    """
     import matplotlib.pyplot as plt
     
-    fig = plt.figure(figsize=(10,20))
+    fig = plt.figure(figsize=(10, 20))
     gs = fig.add_gridspec(3, hspace=0)
     axs = gs.subplots(sharex=True)
 
@@ -205,7 +312,9 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    log_level={0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
-    logging.basicConfig(level=log_level.get(args.verbose, logging.DEBUG), format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    log_level = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
+    logging.basicConfig(level=log_level.get(args.verbose, logging.DEBUG), 
+                        format='%(asctime)s - %(levelname)s - %(message)s', 
+                        datefmt='%Y-%m-%d %H:%M:%S')
 
     main(args)
