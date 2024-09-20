@@ -185,8 +185,31 @@ def get_umap(
 umap = get_umap(adata, random_state=0, spread=1, min_dist=.05, init_pos='random')
 
 # Save UMAP object to disk
-umap_savefile = '../data/v0.3_all/models/umap.pkl'
+umap_savefile = 'out/path/umap.pkl'
 joblib.dump(umap, umap_savefile)
+
+# Load UMAP from disk
+umap = joblib.load('out/path/umap.pkl')
+
+# Transforming query into reference UMAP embedding
+X_embed = query.obsm['X_embed']
+
+chunk_size = 500_000 # UMAP has to be chunked due to memory errors
+transformed_chunks = []
+num_chunks = int(np.ceil(X_embed.shape[0] / chunk_size))
+
+for i in range(num_chunks):
+    start_idx = i * chunk_size
+    end_idx = min((i + 1) * chunk_size, X_embed.shape[0])
+    chunk = X_embed[start_idx:end_idx]
+
+    transformed_chunk = UMAP.transform(chunk)
+    transformed_chunks.append(transformed_chunk)
+    
+    torch.cuda.empty_cache() # Memory is sometimes not released correctly from GPU
+
+query.obsm['X_umap'] = np.vstack(transformed_chunks)
+
 
 
 def add_query(reference: AnnData, query: AnnData, embed: str = 'X_embedded') -> AnnData:
