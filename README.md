@@ -15,6 +15,11 @@ HypoMap3D enables the integration of diverse single-cell datasets into a unified
 - Clustering: Clusters cells into biologically relevant subpopulations using Louvain or Leiden algorithms.
 - Visualization: Produces 3D visualizations of integrated single-cell datasets, facilitating exploration of high-dimensional data.
 - Batch Effect Correction: Corrects for technical variability across datasets, ensuring accurate biological signal extraction.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/ehvr20/HypoMap/refs/heads/main/PipelineOverview.svg" alt="Overview of HypoMap Pipeline"/>
+</p>
+
 ## Installation
 
 ```bash
