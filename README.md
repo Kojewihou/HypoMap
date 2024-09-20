@@ -1,37 +1,36 @@
-# HypoMap v2
 
-Code associated with paper XXXXXXXXX
+# HypoMap3D - Single-Cell Integration Pipeline
 
-## Table of Contents
+Welcome to HypoMap3D, a comprehensive single-cell integration pipeline designed to facilitate large-scale integration and analysis of single-cell RNA-sequencing (scRNA-seq) data. This pipeline was developed as part of the HypoMap3D project, presented in the accompanying academic paper.
 
-- [Usage](#usage)
-- [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
+## Overview
 
-## Usage
+HypoMap3D enables the integration of diverse single-cell datasets into a unified, high-dimensional representation. It is designed to handle complex biological datasets, aligning cellular states across multiple experiments and conditions. The pipeline combines state-of-the-art computational techniques to provide scalable and robust integration, dimensionality reduction, clustering, and visualization.
 
-Download and run setup.sh
 
 ## Features
 
-- Raw Unique and UniqueAndMult-EM matrices using starsolo
-- Cellbender processing of Raw Unique Matrices
-- Count matrix processing for SmartSeq, DropSeq and 10x technologies
+- Scalable Integration: Efficiently integrates datasets with millions of cells from different platforms.
+- Dimensionality Reduction: Generates a reduced feature space for downstream analysis using principal component analysis (PCA), UMAP, or t-SNE.
+- Clustering: Clusters cells into biologically relevant subpopulations using Louvain or Leiden algorithms.
+- Visualization: Produces 3D visualizations of integrated single-cell datasets, facilitating exploration of high-dimensional data.
+- Batch Effect Correction: Corrects for technical variability across datasets, ensuring accurate biological signal extraction.
+## Installation
 
-## Contributing
+```bash
+git clone https://github.com/your-repo/HypoMap3D.git
+```
 
-We are currently not taking contributions.
+Images can be found: [here]
+## Example Notebooks
 
+Check out the example Jupyter notebooks provided in the notebooks/ folder for step-by-step guides on how to use the pipeline for your data.
+## Citation
+
+If you use HypoMap3D in your work, please cite our accompanying paper:
+
+HypoMap3D: High-dimensional single-cell integration pipeline for scRNA-seq analysis. (Authors et al., Year). Journal/Conference Name. DOI.
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) file for details.
+[MIT](https://choosealicense.com/licenses/mit/)
 
-## Acknowledgments
-
-- See references in XXXXXX
-
-## Contact
-
-If you have any questions or feedback, feel free to [open an issue](https://github.com/ehvr20/HypoMap/issues).
