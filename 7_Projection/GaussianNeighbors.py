@@ -21,7 +21,7 @@ Example usage:
 
 import numpy as np
 import scipy.sparse as sp
-from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import NearestNeighbors # replace with cuml.neighbors for GPU accelerated KNN for large datasets
 import scanpy as sc
 
 def GaussianNeighbors(reference: sc.AnnData, query: sc.AnnData, embed: str = 'X_embed', n_neighbors: int = 15) -> sp.csr_matrix:
@@ -50,7 +50,7 @@ def GaussianNeighbors(reference: sc.AnnData, query: sc.AnnData, embed: str = 'X_
     """
 
     # Initialize and fit the k-NN model on the reference embedding
-    query_nn = NearestNeighbors(n_neighbors, algorithm='brute', metric='euclidean')
+    query_nn = NearestNeighbors(n_neighbors=n_neighbors, algorithm='brute', metric='euclidean')
     query_nn.fit(reference.obsm[embed])
     
     # Compute the k-nearest neighbors for the query data
