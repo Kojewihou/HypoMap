@@ -121,16 +121,19 @@ def smooth_across_voxels(
 
 def normalize_scores_axis(voxel_matrix: NDArray[np.float64]) -> NDArray[np.float64]:
     """[ChatGPT Generated Documentation]
-    Normalizes scores along the last axis of the voxel grid.
+    Normalizes scores along the score axis (3) of the voxel grid.
 
     Parameters:
-    - voxel_matrix (NDArray[np.float64]): A 3D or 4D grid of scores representing the voxel data.
+    - voxel_matrix (NDArray[np.float64]): A 4D grid of scores representing the voxel data.
 
     Returns:
-    - NDArray[np.float64]: The voxel grid with normalized scores along the last axis.
+    - NDArray[np.float64]: The voxel grid with normalized scores along the score axis (3).
 
     Notes:
     - The function prevents division by zero by normalizing only where score totals are positive.
     """
-    score_totals = np.sum(voxel_matrix, axis=-1, keepdims=True)
+    
+    assert voxel_matrix.ndim == 4, f'voxel_matrix is not 4D - (ndim={voxel_matrix.ndim})'
+    
+    score_totals = np.sum(voxel_matrix, axis=3, keepdims=True)
     return np.divide(voxel_matrix, score_totals, where=(score_totals > 0))
