@@ -1,27 +1,27 @@
 """[ChatGPT Generated Documentation]
-Voxel Aggregation and Smoothing Script
+This script provides functions for aggregating and smoothing voxel data based on 3D point clouds and their associated scores. 
+It includes utilities to divide spatial data into voxels, aggregate scores within each voxel, apply smoothing, and normalize 
+scores along specific axes.
 
-This script provides two main functions for processing 3D spatial data in a voxel grid format:
-1. `aggregate_voxels`: Aggregates scores within a voxel grid by calculating the mean score for each voxel based on 3D point locations.
-2. `smooth_across_voxels`: Applies Gaussian smoothing to a voxel matrix, creating a continuous field from discrete voxel data.
+Functions included:
+1. `aggregate_voxels`: Aggregates points and scores into a 3D voxel grid.
+2. `smooth_across_voxels`: Applies Gaussian smoothing across the voxel grid, with options to ignore certain voxels.
+3. `normalize_scores_axis`: Normalizes scores across a specified axis of the voxel grid.
 
 Example Usage:
 --------------
-points = np.array([[1.5, 2.0, 3.0], [4.0, 5.0, 6.0], ...])  # (N, 3) array of 3D points
-scores = np.array([0.8, 1.2, ...])  # (N,) array of scores
-voxel_size = 2
+# Aggregate voxels from points and scores
+mean_scores, counts = aggregate_voxels(points, scores, voxel_size=5)
 
-mean_scores_grid, counts_grid = aggregate_voxels(points, scores, voxel_size)
-smoothed_scores_grid = smooth_across_voxels(mean_scores_grid, sigma=1.0)
+# Smooth the aggregated voxel matrix
+smoothed_voxels = smooth_across_voxels(mean_scores, sigma=1.0, score_threshold=0.1)
 
-Functions:
-----------
-- aggregate_voxels(points: NDArray, scores: NDArray, voxel_size: int) -> Tuple[NDArray, NDArray]
-- smooth_across_voxels(voxel_matrix: NDArray, sigma: float) -> NDArray
+# Normalize scores across the last axis
+normalized_voxels = normalize_scores_axis(smoothed_voxels)
 """
 
 import numpy as np
-from typing import Tuple
+from typing import Tuple, Optional
 from numpy.typing import NDArray
 from scipy.ndimage import gaussian_filter
 
@@ -31,40 +31,22 @@ def aggregate_voxels(
     voxel_size: int
 ) -> Tuple[NDArray[np.float64], NDArray[np.int64]]:
     """[ChatGPT Generated Documentation]
-    Aggregates scores within a 3D voxel grid based on given points, calculating mean scores for each voxel.
+    Aggregates points and scores into a 3D voxel grid, computing the average score in each voxel.
 
-    Given a set of 3D points, this function groups the points into voxels of a specified size and aggregates the
-    corresponding scores within each voxel. If multiple score metrics are provided, the mean score for each metric 
-    is calculated independently per voxel.
+    Parameters:
+    - points (NDArray[np.float64]): An array of shape (N, 3) containing 3D coordinates of the points.
+    - scores (NDArray[np.float64]): An array of shape (N,) or (N, M) containing the scores associated with each point. 
+    - voxel_size (int): Size of each voxel.
 
-    Parameters
-    ----------
-    points : NDArray[np.float64]
-        An (N, 3) array of 3D coordinates, where N is the number of points.
-    scores : NDArray[np.float64]
-        An (N,) array of scores associated with each point, or an (N, M) array where each column represents a 
-        different score metric.
-    voxel_size : int
-        The edge length of each voxel, which determines the binning resolution for the points.
+    Returns:
+    - Tuple[NDArray[np.float64], NDArray[np.int64]]: 
+        - `mean_scores_grid` (NDArray[np.float64]): A 3D grid of mean scores within each voxel, shape (X, Y, Z, M) or (X, Y, Z).
+        - `counts_grid` (NDArray[np.int64]): A 3D grid of point counts within each voxel, shape (X, Y, Z).
 
-    Returns
-    -------
-    mean_scores_grid : NDArray[np.float64]
-        A 3D array of mean scores per voxel if there is a single metric, or a 4D array (X, Y, Z, M) if there are 
-        multiple metrics. Each voxel contains the average score for all points within it.
-    counts_grid : NDArray[np.int64]
-        A 3D array (X, Y, Z) representing the number of points in each voxel.
-
-    Notes
-    -----
-    - The `points` array should contain 3D coordinates; otherwise, results may be unpredictable.
-    - The `scores` array can be either 1D or 2D. A 1D array is reshaped for compatibility, and the function
-      handles it as a single score metric.
-    - Voxel indices are determined by dividing the point coordinates by `voxel_size`.
-    - If there are no points in a voxel, the mean score for that voxel is zero.
-    - This function returns the mean score for each voxel, with the shape adjusted based on the number of metrics.
+    Notes:
+    - If `scores` has only one metric, the output `mean_scores_grid` will have the last dimension removed for simplicity.
+    - This function uses numpy's `add.at` for efficient aggregation over large voxel grids.
     """
-    
     if scores.ndim == 1:
         scores = scores[:, None]  # Reshape (N,) to (N, 1)
         
@@ -103,21 +85,52 @@ def aggregate_voxels(
 
 def smooth_across_voxels(
     voxel_matrix: NDArray[np.float64], 
-    sigma: float
+    sigma: float,
+    ignore_zero_matrices: bool=True,
+    score_threshold: Optional[float] = None,
 ) -> NDArray[np.float64]:
     """[ChatGPT Generated Documentation]
-    Applies Gaussian smoothing across a voxel matrix, reducing discrete data noise and creating a continuous field.
+    Applies Gaussian smoothing across a voxel grid, with options to threshold and ignore certain matrices.
 
-    Parameters
-    ----------
-    voxel_matrix : NDArray[np.float64]
-        A 3D or 4D voxel matrix to apply the Gaussian smoothing to. Dimensions represent (X, Y, Z) or (X, Y, Z, M).
-    sigma : float
-        Standard deviation for Gaussian kernel, controlling the degree of smoothing.
+    Parameters:
+    - voxel_matrix (NDArray[np.float64]): A 3D or 4D grid of scores representing the voxel data.
+    - sigma (float): Standard deviation for the Gaussian kernel.
+    - ignore_zero_matrices (bool): If True, applies smoothing only to non-zero matrices.
+    - score_threshold (Optional[float]): Optional threshold; values below are set to zero before smoothing.
 
-    Returns
-    -------
-    smoothed_matrix : NDArray[np.float64]
-        A smoothed version of the voxel matrix, with the same shape as the input.
+    Returns:
+    - NDArray[np.float64]: The smoothed voxel grid with the same shape as `voxel_matrix`.
+
+    Notes:
+    - The Gaussian smoothing is applied along the first three dimensions of the voxel grid.
+    - `ignore_zero_matrices` avoids smoothing over areas with no valid data if set to True.
     """
-    return gaussian_filter(voxel_matrix, sigma=sigma, truncate=3, mode='constant', axes=[0, 1, 2])
+    smoothed_voxel_matrix = voxel_matrix.copy()
+    
+    # Optionally reduce noise by setting any score below a threshold to 0
+    if score_threshold:
+        smoothed_voxel_matrix[smoothed_voxel_matrix < score_threshold] = 0
+        
+    if ignore_zero_matrices:
+        mask = np.count_nonzero(smoothed_voxel_matrix, axis=(0, 1, 2)) != 0
+        smoothed_voxel_matrix[mask] = gaussian_filter(smoothed_voxel_matrix[mask], sigma=sigma, truncate=3, mode='constant', axes=[0, 1, 2])
+    else:
+        smoothed_voxel_matrix = gaussian_filter(smoothed_voxel_matrix, sigma=sigma, truncate=3, mode='constant', axes=[0, 1, 2])
+    
+    return smoothed_voxel_matrix
+
+def normalize_scores_axis(voxel_matrix: NDArray[np.float64]) -> NDArray[np.float64]:
+    """[ChatGPT Generated Documentation]
+    Normalizes scores along the last axis of the voxel grid.
+
+    Parameters:
+    - voxel_matrix (NDArray[np.float64]): A 3D or 4D grid of scores representing the voxel data.
+
+    Returns:
+    - NDArray[np.float64]: The voxel grid with normalized scores along the last axis.
+
+    Notes:
+    - The function prevents division by zero by normalizing only where score totals are positive.
+    """
+    score_totals = np.sum(voxel_matrix, axis=-1, keepdims=True)
+    return np.divide(voxel_matrix, score_totals, where=(score_totals > 0))
