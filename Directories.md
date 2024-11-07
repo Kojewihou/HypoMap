@@ -6,3 +6,4 @@
 5. Bulk GPU leiden clustering, consensus clustering and hierarchical reconcilation
 6. Marker gene detection, purning and annotation
 7. Propgation of labels, projection and UMAP transfromations.
+8. Spatial Transcriptomic analysis functions.

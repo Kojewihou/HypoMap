@@ -110,8 +110,8 @@ def smooth_across_voxels(
     # Optionally reduce noise by setting any score below a threshold to 0
     if score_threshold:
         smoothed_voxel_matrix[smoothed_voxel_matrix < score_threshold] = 0
-        
-    if ignore_zero_matrices:
+    
+    if ignore_zero_matrices: # Untested
         mask = np.count_nonzero(smoothed_voxel_matrix, axis=(0, 1, 2)) != 0
         smoothed_voxel_matrix[mask] = gaussian_filter(smoothed_voxel_matrix[mask], sigma=sigma, truncate=3, mode='constant', axes=[0, 1, 2])
     else:
@@ -133,7 +133,7 @@ def normalize_scores_axis(voxel_matrix: NDArray[np.float64]) -> NDArray[np.float
     - The function prevents division by zero by normalizing only where score totals are positive.
     """
     
-    assert voxel_matrix.ndim == 4, f'voxel_matrix is not 4D - (ndim={voxel_matrix.ndim})'
+    assert voxel_matrix.ndim == 4, f'voxel_matrix is not 4D - (ndim={voxel_matrix.ndim})' # Untested
     
     score_totals = np.sum(voxel_matrix, axis=3, keepdims=True)
     return np.divide(voxel_matrix, score_totals, where=(score_totals > 0))
